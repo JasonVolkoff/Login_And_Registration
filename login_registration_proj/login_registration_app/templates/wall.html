@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light justify-content-between">
+        <span class="navbar-brand mb-0 h1">CodingDojo Wall</span>
+        <div>
+            <p>Welcome {{ request.session.this_user }}</p>
+            <a href="/logout">Log off</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div>
+            <h1>Post a message</h1>
+            <form action="wall/post_message" method="POST">
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <textarea class="form-control" name="message" rows="5"></textarea>
+                </div>
+                <div class="d-flex flex-row-reverse">
+                    <button class="btn btn-primary">Post a message</button>
+                </div>
+            </form>
+        </div>
+        <div>
+            {% for post in messages %}
+            <p><i><b>Message by: </b>{{ post.poster.first_name }} {{ post.poster.last_name }} - {{ post.created_at }}
+                </i></p>
+            <div class="container">
+                <p>{{ post.msg_text }}</p>
+                <div class="container">
+
+                    {% for comment in post.message_comments.all %}
+                    <p><i><b>Comment by: </b>{{ comment.poster.first_name }} {{ comment.poster.last_name }} -
+                            {{ comment.created_at }}
+                            {% if comment.poster.id == user.id %} <a
+                                href="wall/delete/{{ comment.id }}">Delete</a>{% endif %}</i></p>
+                    <p class="container">{{ comment.comment_text }}</p>
+
+
+
+                    {% endfor %}
+                    <div class="container">
+                        <p><b>Post a comment</b></p>
+                        <form action="wall/comment/{{post.id}}" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group mb-2">
+                                <textarea class="form-control" name="comment" rows="4"></textarea>
+                            </div>
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-success">Post a comment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+
+            {% endfor %}
+
+
+
+
+            {% comment %} {% for post in user.user_messages.all %}
+            <phone2numeri><b>{{ post.poster.first_name }} {{ post.poster.last_name }} -
+                    {% if post.updated_at %}
+                    {{ post.updated_at }}
+                    {% else %}
+                    {{ post.created_at }}
+                    {% endif %}
+                </b></>
+                <div class="container mb-2">
+                    <p>{{ post.msg_text }}</p>
+                    <div class="container">
+                        {% for comment in user.user_messages.userco %}{% endfor %}
+                    </div>
+                </div>
+                {% endfor %} {% endcomment %}
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,5 +1,8 @@
 from django.db import models
 import re
+from django.db.models.deletion import CASCADE
+
+from django.db.models.fields.related import ForeignKey
 import bcrypt
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
@@ -48,3 +51,22 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
     objects = UserManager()
+
+
+class Message(models.Model):
+    msg_text = models.TextField()
+    poster = models.ForeignKey(
+        User, related_name="user_messages", on_delete=models.CASCADE)
+    user_likes = models.ManyToManyField(User, related_name="liked_posts")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Comment(models.Model):
+    comment_text = models.TextField()
+    poster = models.ForeignKey(
+        User, related_name="user_comments", on_delete=models.CASCADE)
+    wall_message = models.ForeignKey(
+        Message, related_name="message_comments", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
